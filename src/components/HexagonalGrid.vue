@@ -3,8 +3,8 @@
     <canvas
       id="canvas"
       ref="canvas"
-      width="2000"
-      height="2000"
+      width="300"
+      height="200"
       style="border: 1px solid #000000; overflow: scroll"
       @click="handleHexClick"
     ></canvas>
@@ -13,19 +13,20 @@
 <script>
 const P2 = (x, y) => ({ x, y });
 const EDGES = 6;
-const RADIUS = 50;
-const MAP_SIZE = 70;
+const RADIUS = 25;
+const MAP_SIZE = 8;
 const TAU = 2 * Math.PI;
 const EDGE_LEN = Math.sin(Math.PI / EDGES) * RADIUS * 2;
 const GRID_Y_SPACE = Math.cos(Math.PI / EDGES) * RADIUS * 2;
 const GRID_X_SPACE = RADIUS * 2 - EDGE_LEN * 0.5;
 const GRID_Y_OFFSET = GRID_Y_SPACE * 0.5;
-const MAP_WIDTH = 2 * MAP_SIZE * GRID_Y_SPACE;
+const MAP_WIDTH = (1.8 * MAP_SIZE + 2) * Math.round(GRID_Y_SPACE);
+const MAP_HEIGHT = (2.1 * MAP_SIZE + 2) * Math.round(GRID_Y_SPACE);
 
 export default {
   mounted() {
-    document.getElementById("canvas").setAttribute("width", MAP_WIDTH);
-    document.getElementById("canvas").setAttribute("height", MAP_WIDTH);
+    document.getElementById("canvas").setAttribute("width", MAP_WIDTH + "px");
+    document.getElementById("canvas").setAttribute("height", MAP_HEIGHT + "px");
     this.drawGrid(MAP_SIZE, this.createPoly(EDGES));
   },
   methods: {
@@ -42,7 +43,7 @@ export default {
       }
     },
     gridToPixel(gridX, gridY, radius, p = {}) {
-      p.x = (gridX + radius + 2) * GRID_X_SPACE;
+      p.x = (gridX + radius + 1) * GRID_X_SPACE;
       p.y = (gridY + radius + 1) * GRID_Y_SPACE + gridX * GRID_Y_OFFSET;
       return p;
     },
