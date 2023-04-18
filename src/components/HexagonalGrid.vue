@@ -10,7 +10,6 @@
 }
 
 .container {
-  background: #333;
   display: grid;
   grid-template-columns: auto auto auto;
   padding: 8px;
@@ -41,14 +40,8 @@ export default {
     var canvas = document.getElementById("canvas");
     canvas.setAttribute("width", MAP_WIDTH + "px");
     canvas.setAttribute("height", MAP_HEIGHT + "px");
-    this.drawGrid(MAP_SIZE, this.createPoly(EDGES));
+    this.drawGrid(MAP_SIZE, this.createPoly(RADIUS, EDGES));
 
-    /*
-  this is an implementation of Wes Bos click & drag scroll algorythm. In his video, he shows how to do the horizontal scroll. I have implemented the vertical scroll for those wondering how to make it as well.
-
-  Wes Bos video:
-    https://www.youtube.com/watch?v=C9EWifQ5xqA
-*/
     const container = document.querySelector("#items-container");
 
     let startY;
@@ -106,15 +99,42 @@ export default {
           console.log(distance);
           var color = "#" + distance + distance + distance;
           */
-          var color = "#333A";
 
+          if (this.distance(x, y) > 3) {
+            const random_number = Math.floor(Math.random() * 100) + 1;
+            var type = "void";
+            if (random_number < 85) {
+              var color = "#3330";
+            } else if (random_number < 95) {
+              type = "planet";
+              const rand = Math.floor(Math.random() * 100) + 1;
+              if (rand < 15) {
+                var color = "#999";
+              } else if (rand < 45) {
+                var color = "#DDF";
+              } else if (rand < 65) {
+                var color = "#700";
+              } else {
+                var color = "#080";
+              }
+            } else {
+              type = "asteroid";
+              var color = "#5208";
+            }
+          } else {
+            var color = "#3330";
+          }
           if (y == 0 && x == 0) {
             color = "#FF0C";
           }
-
           ctx.fillStyle = color;
           const hexCenter = this.gridToPixel(y, x, radius, center);
-          this.drawPoly(hexCenter, hexPoints, ctx, y, x);
+          if (y == 0 && x == 0) {
+            this.drawPlanet(hexCenter, RADIUS * 2.1, ctx, "#FF0F");
+          } else if (this.distance(x, y) < 2) {
+          } else {
+            this.drawPoly(hexCenter, hexPoints, ctx, y, x, type, color);
+          }
         }
       }
     },
@@ -130,12 +150,101 @@ export default {
         return Math.max(dx, dy);
       }
     },
-    gridToPixel(gridX, gridY, radius, p = {}) {
+    gridToPixel(gridX, gridY, radius, p = {}, color) {
       p.x = (gridX + radius + 1) * GRID_X_SPACE;
       p.y = (gridY + radius + 1) * GRID_Y_SPACE + gridX * GRID_Y_OFFSET;
       return p;
     },
-    drawPoly(p, points, ctx, col, row) {
+    pixelToGrid(p) {
+      var near = [];
+      const radius = MAP_SIZE;
+      for (let y = radius; y >= -radius; y--) {
+        for (let x = -radius; x <= radius; x++) {
+          const o = this.gridToPixel(x, y, radius);
+          const dx = p.x - o.x;
+          const dy = p.y - o.y;
+          const d = dx * dx + dy * dy;
+          if (d < RADIUS * RADIUS) {
+            near.push([x, y]);
+          }
+        }
+      }
+      return near;
+    },
+    drawPoly(p, points, ctx, col, row, type, color) {
+      // p.x, p.y is center
+      ctx.setTransform(1, 0, 0, 1, p.x, p.y);
+      var i = 0;
+      ctx.beginPath();
+      while (i < points.length) {
+        const p2 = points[i++];
+        ctx.lineTo(p2.x, p2.y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = "#FFFFFF";
+      ctx.stroke();
+      ctx.textAlign = "center";
+
+      if (type == "void") {
+        ctx.fill();
+        ctx.fillStyle = "#FFFFFF";
+      }
+
+      ctx.fillText(`(${col},${row})`, 0, 0);
+      if (type == "planet") {
+        this.drawPlanet(p, RADIUS - 30, ctx, color);
+      } else if (type == "asteroid") {
+        this.drawAsteroids(p, RADIUS / 6, ctx);
+      }
+    },
+
+    drawAsteroids(p, radius, ctx) {
+      var asteroidNumber = Math.floor(Math.random() * 10) + 4;
+      var i = 0;
+      console.log(asteroidNumber);
+      while (i < asteroidNumber) {
+        var maxX = p.x + GRID_X_SPACE / 2;
+        var minX = p.x - GRID_X_SPACE / 2;
+        var maxY = p.y + GRID_Y_SPACE / 2;
+        var minY = p.y - GRID_Y_SPACE / 2;
+
+        var randX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+        var randY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
+        var gridRand = this.pixelToGrid(P2(randX, randY))[0];
+        var grid = this.pixelToGrid(P2(p.x, p.y))[0];
+        var distance = this.distance(gridRand[0], gridRand[1], grid[0], grid[1]);
+        while (distance != 0) {
+          randX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+          randY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
+          gridRand = this.pixelToGrid(P2(randX, randY))[0];
+          grid = this.pixelToGrid(P2(p.x, p.y))[0];
+          distance = this.distance(gridRand[0], gridRand[1], grid[0], grid[1]);
+        }
+
+        var asteroidEdges = Math.floor(Math.random() * 6) + 4;
+        var points = this.createPoly(radius, asteroidEdges);
+        this.drawCube(points, randX, randY, ctx);
+        i++;
+      }
+    },
+
+    drawCube(points, x, y, ctx) {
+      ctx.setTransform(1, 0, 0, 1, x, y);
+      var i = 0;
+      ctx.beginPath();
+      while (i < points.length) {
+        const p2 = points[i++];
+        ctx.lineTo(p2.x, p2.y);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = "#520";
+      ctx.stroke();
+      ctx.fillStyle = "#520";
+    },
+
+    drawPlanet(p, radius, ctx, color) {
+      var points = this.createPoly(radius, 12);
       // p.x, p.y is center
       ctx.setTransform(1, 0, 0, 1, p.x, p.y);
       var i = 0;
@@ -146,25 +255,22 @@ export default {
       }
       ctx.closePath();
       ctx.fill();
-      ctx.strokeStyle = "#FFFFFF";
+      ctx.strokeStyle = color;
       ctx.stroke();
-      ctx.fillStyle = "#FFFFFF";
-      ctx.textAlign = "center";
-
-      //ctx.fillText(`(${col},${row})`, 0, 0);
+      ctx.fillStyle = color;
     },
-    createPoly(sides, points = []) {
+
+    createPoly(radius, sides, points = []) {
       const step = TAU / sides;
       var ang = 0,
         i = sides;
       while (i--) {
-        points.push(P2(RADIUS * Math.cos(ang), RADIUS * Math.sin(ang)));
+        points.push(P2(radius * Math.cos(ang), radius * Math.sin(ang)));
         ang += step;
       }
       return points;
     },
     handleHexClick(event) {
-      console.log("yo");
       const canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
 
