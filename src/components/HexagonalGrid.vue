@@ -1,21 +1,32 @@
 <template>
   <div>
-    <canvas ref="canvas" width="2000" height="2000" style="border: 1px solid #000000" @click="handleHexClick"></canvas>
+    <canvas
+      id="canvas"
+      ref="canvas"
+      width="2000"
+      height="2000"
+      style="border: 1px solid #000000; overflow: scroll"
+      @click="handleHexClick"
+    ></canvas>
   </div>
 </template>
 <script>
 const P2 = (x, y) => ({ x, y });
 const EDGES = 6;
 const RADIUS = 50;
+const MAP_SIZE = 70;
 const TAU = 2 * Math.PI;
 const EDGE_LEN = Math.sin(Math.PI / EDGES) * RADIUS * 2;
 const GRID_Y_SPACE = Math.cos(Math.PI / EDGES) * RADIUS * 2;
 const GRID_X_SPACE = RADIUS * 2 - EDGE_LEN * 0.5;
 const GRID_Y_OFFSET = GRID_Y_SPACE * 0.5;
+const MAP_WIDTH = 2 * MAP_SIZE * GRID_Y_SPACE;
 
 export default {
   mounted() {
-    this.drawGrid(5, this.createPoly(EDGES));
+    document.getElementById("canvas").setAttribute("width", MAP_WIDTH);
+    document.getElementById("canvas").setAttribute("height", MAP_WIDTH);
+    this.drawGrid(MAP_SIZE, this.createPoly(EDGES));
   },
   methods: {
     drawGrid(radius, hexPoints) {
@@ -23,7 +34,7 @@ export default {
       const center = P2();
       for (let y = radius; y >= -radius; y--) {
         for (let x = -radius; x <= radius; x++) {
-          if (x * y < 0 && Math.abs(x) + Math.abs(y) > radius) continue;
+          if (x * y > 0 && Math.abs(x) + Math.abs(y) > radius) continue;
           ctx.fillStyle = "#000000";
           const hexCenter = this.gridToPixel(y, x, radius, center);
           this.drawPoly(hexCenter, hexPoints, ctx, y, x);
@@ -31,7 +42,7 @@ export default {
       }
     },
     gridToPixel(gridX, gridY, radius, p = {}) {
-      p.x = (gridX + radius + 1) * GRID_X_SPACE;
+      p.x = (gridX + radius + 2) * GRID_X_SPACE;
       p.y = (gridY + radius + 1) * GRID_Y_SPACE + gridX * GRID_Y_OFFSET;
       return p;
     },
@@ -64,9 +75,15 @@ export default {
       return points;
     },
     handleHexClick(event) {
-      const rect = event.target.getBoundingClientRect();
+      console.log("yo");
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      ctx.moveTo(1000, 0);
+
+      /*const rect = event.target.getBoundingClientRect();
       const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+      const y = event.clientY - rect.top;*/
       //const clickedHex = this.getHexFromPixel(P2(x, y));
       //console.log(`Clicked hex: (${clickedHex.x},${clickedHex.y})`);
     },

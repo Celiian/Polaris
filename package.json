@@ -12,6 +12,7 @@
   "dependencies": {
     "hex-grid-map": "^0.14.0",
     "hex-grid-map-3d": "^1.5.1",
+    "hexgrid": "^0.0.1",
     "konva": "^9.0.1",
     "pinia": "^2.0.32",
     "three": "^0.151.3",

@@ -19,7 +19,6 @@ export default {
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   text-align: center;
-  background-color: white;
   color: #2c3e50;
   margin-top: 60px;
   width: 100%;

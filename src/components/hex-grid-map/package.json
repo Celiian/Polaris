@@ -1,0 +1,80 @@
+{
+  "name": "hex-grid-map",
+  "version": "0.14.0",
+  "description": "A customizeable html5 hexagonally gridded interactive map",
+  "main": "index.js",
+  "scripts": {
+    "build": "mkdirp ./target/gh-pages && npm run jsdoc && npm run less && npm run copy:demoHTML && webpack --mode production --config ./webpack-prod.config.js",
+    "buildDev": "mkdirp ./target/gh-pages && npm run jsdoc && npm run less && npm run copy:demoHTML && webpack --mode development --config ./webpack-prod.config.js",
+    "less": "lessc ./gh-pages/src/less/main.less > ./target/gh-pages/styles.css",
+    "copy:demoHTML": "copyfiles -f ./gh-pages/src/index.html ./target/gh-pages",
+    "jsdoc": "jsdoc -t ./jsdoc-template -r ./src -d ./target/jsdoc",
+    "start": "webpack-dev-server --config ./webpack-prod.config.js --mode development --content-base ./target/gh-pages --host 0.0.0.0 --port 80"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chad-autry/hex-grid-map.git"
+  },
+  "keywords": [
+    "canvas",
+    "hexagon",
+    "grid",
+    "paper.js"
+  ],
+  "author": {
+    "name": "Chad Autry",
+    "email": "chad.autry@gmail.com",
+    "url": "http://chad-autry.github.io/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chad-autry/hex-grid-map/issues"
+  },
+  "homepage": "https://github.com/chad-autry/hex-grid-map",
+  "dependencies": {
+    "cartesian-hexagonal": "0.0.3",
+    "collections": "^1.2.1",
+    "paper": "^0.12.11"
+  },
+  "devDependencies": {
+    "jsdoc": "^3.3.2",
+    "bootstrap": "^3.4.1",
+    "cartesian-hexagonal": "0.0.3",
+    "client-auth-jwt": "^0.7.3",
+    "data-chains": "^0.4.0",
+    "hex-grid-map": "^0.12.0",
+    "moment": "^2.18.1",
+    "prop-types": "^15.5.10",
+    "react-ace": "^4.1.1",
+    "react-loading-overlay": "^1.0.1",
+    "react-measure": "^1.4.5",
+    "react-router-dom": "^4.0.0",
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "@babel/preset-react": "^7.0.0",
+    "babel-cli": "^6.18.0",
+    "babel-loader": "^8.0.5",
+    "copyfiles": "^0.2.1",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^2.3.0",
+    "eslint-plugin-prettier": "^2.1.2",
+    "eslint-plugin-react": "^7.2.0",
+    "less": "^3.9.0",
+    "lint-staged": "^8.1.6",
+    "mkdirp": "^0.5.1",
+    "prettier": "^1.5.3",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "rimraf": "^2.4.4",
+    "terser-webpack-plugin": "^1.4.1",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.2",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "lint-staged": {
+    "*.js, *.jsx": [
+      "eslint",
+      "git add"
+    ]
+  }
+}
