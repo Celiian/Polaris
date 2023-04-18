@@ -1,33 +1,96 @@
 <template>
-  <div>
-    <canvas
-      id="canvas"
-      ref="canvas"
-      width="300"
-      height="200"
-      style="border: 1px solid #000000; overflow: scroll"
-      @click="handleHexClick"
-    ></canvas>
+  <div class="container" id="items-container">
+    <canvas id="canvas" ref="canvas" width="300" height="300" @click="handleHexClick"></canvas>
   </div>
 </template>
+
+<style>
+#canvas {
+  scrollbar-width: none;
+}
+
+.container {
+  background: #333;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  padding: 8px;
+  box-sizing: border-box;
+  height: 100vh;
+  overflow: auto;
+  cursor: grab;
+  scrollbar-width: none;
+  background-image: url("../assets/starry.jpg");
+}
+</style>
+
 <script>
 const P2 = (x, y) => ({ x, y });
 const EDGES = 6;
-const RADIUS = 25;
-const MAP_SIZE = 8;
+const RADIUS = 65;
+const MAP_SIZE = 17;
 const TAU = 2 * Math.PI;
 const EDGE_LEN = Math.sin(Math.PI / EDGES) * RADIUS * 2;
 const GRID_Y_SPACE = Math.cos(Math.PI / EDGES) * RADIUS * 2;
 const GRID_X_SPACE = RADIUS * 2 - EDGE_LEN * 0.5;
 const GRID_Y_OFFSET = GRID_Y_SPACE * 0.5;
-const MAP_WIDTH = (1.8 * MAP_SIZE + 2) * Math.round(GRID_Y_SPACE);
-const MAP_HEIGHT = (2.1 * MAP_SIZE + 2) * Math.round(GRID_Y_SPACE);
+const MAP_WIDTH = (1.75 * MAP_SIZE + 2) * Math.round(GRID_Y_SPACE);
+const MAP_HEIGHT = (2.05 * MAP_SIZE + 2) * Math.round(GRID_Y_SPACE);
 
 export default {
   mounted() {
-    document.getElementById("canvas").setAttribute("width", MAP_WIDTH + "px");
-    document.getElementById("canvas").setAttribute("height", MAP_HEIGHT + "px");
+    var canvas = document.getElementById("canvas");
+    canvas.setAttribute("width", MAP_WIDTH + "px");
+    canvas.setAttribute("height", MAP_HEIGHT + "px");
     this.drawGrid(MAP_SIZE, this.createPoly(EDGES));
+
+    /*
+  this is an implementation of Wes Bos click & drag scroll algorythm. In his video, he shows how to do the horizontal scroll. I have implemented the vertical scroll for those wondering how to make it as well.
+
+  Wes Bos video:
+    https://www.youtube.com/watch?v=C9EWifQ5xqA
+*/
+    const container = document.querySelector("#items-container");
+
+    let startY;
+    let startX;
+    let scrollLeft;
+    let scrollTop;
+    let isDown;
+
+    container.addEventListener("mousedown", (e) => mouseIsDown(e));
+    container.addEventListener("mouseup", (e) => mouseUp(e));
+    container.addEventListener("mouseleave", (e) => mouseLeave(e));
+    container.addEventListener("mousemove", (e) => mouseMove(e));
+
+    function mouseIsDown(e) {
+      isDown = true;
+      startY = e.pageY - container.offsetTop;
+      startX = e.pageX - container.offsetLeft;
+      scrollLeft = container.scrollLeft;
+      scrollTop = container.scrollTop;
+      container.style.cursor = "grabbing";
+    }
+    function mouseUp(e) {
+      isDown = false;
+      container.style.cursor = "grab";
+    }
+    function mouseLeave(e) {
+      isDown = false;
+    }
+    function mouseMove(e) {
+      if (isDown) {
+        e.preventDefault();
+        //Move vertcally
+        const y = e.pageY - container.offsetTop;
+        const walkY = y - startY;
+        container.scrollTop = scrollTop - walkY;
+
+        //Move Horizontally
+        const x = e.pageX - container.offsetLeft;
+        const walkX = x - startX;
+        container.scrollLeft = scrollLeft - walkX;
+      }
+    }
   },
   methods: {
     drawGrid(radius, hexPoints) {
@@ -36,10 +99,35 @@ export default {
       for (let y = radius; y >= -radius; y--) {
         for (let x = -radius; x <= radius; x++) {
           if (x * y > 0 && Math.abs(x) + Math.abs(y) > radius) continue;
-          ctx.fillStyle = "#000000";
+          /*var distance = 9 - this.distance(x, y);
+          if (distance <= 0) {
+            distance = 0;
+          }
+          console.log(distance);
+          var color = "#" + distance + distance + distance;
+          */
+          var color = "#333A";
+
+          if (y == 0 && x == 0) {
+            color = "#FF0C";
+          }
+
+          ctx.fillStyle = color;
           const hexCenter = this.gridToPixel(y, x, radius, center);
           this.drawPoly(hexCenter, hexPoints, ctx, y, x);
         }
+      }
+    },
+    distance(xa, ya, xb = 0, yb = 0) {
+      var dx = xa - xb;
+      var dy = ya - yb;
+      const sameSign = dx * dy > 0;
+      dx = Math.abs(dx);
+      dy = Math.abs(dy);
+      if (sameSign) {
+        return dx + dy;
+      } else {
+        return Math.max(dx, dy);
       }
     },
     gridToPixel(gridX, gridY, radius, p = {}) {
@@ -63,7 +151,7 @@ export default {
       ctx.fillStyle = "#FFFFFF";
       ctx.textAlign = "center";
 
-      ctx.fillText(`(${col},${row})`, 0, 0);
+      //ctx.fillText(`(${col},${row})`, 0, 0);
     },
     createPoly(sides, points = []) {
       const step = TAU / sides;
