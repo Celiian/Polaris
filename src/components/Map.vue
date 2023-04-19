@@ -23,24 +23,47 @@
 </style>
 
 <script>
+import { mapActions } from "pinia";
+import { useGameStore } from "../store/myStore";
+
 const P2 = (x, y) => ({ x, y });
-const EDGES = 6;
-const RADIUS = 65;
-const MAP_SIZE = 27;
-const TAU = 2 * Math.PI;
-const EDGE_LEN = Math.sin(Math.PI / EDGES) * RADIUS * 2;
-const GRID_Y_SPACE = Math.cos(Math.PI / EDGES) * RADIUS * 2;
-const GRID_X_SPACE = RADIUS * 2 - EDGE_LEN * 0.5;
-const GRID_Y_OFFSET = GRID_Y_SPACE * 0.5;
-const MAP_WIDTH = (1.75 * MAP_SIZE + 2) * Math.round(GRID_Y_SPACE);
-const MAP_HEIGHT = (2.05 * MAP_SIZE + 2) * Math.round(GRID_Y_SPACE);
 
 export default {
+  data() {
+    return {
+      EDGES: 6,
+      RADIUS: 65,
+      TAU: 2 * Math.PI,
+      MAP_SIZE: 27,
+      MAP: [],
+    };
+  },
+  computed: {
+    EDGE_LEN() {
+      return Math.sin(Math.PI / this.EDGES) * this.RADIUS * 2;
+    },
+    GRID_Y_SPACE() {
+      return Math.cos(Math.PI / this.EDGES) * this.RADIUS * 2;
+    },
+    GRID_Y_OFFSET() {
+      return this.GRID_Y_SPACE * 0.5;
+    },
+    MAP_WIDTH() {
+      return (1.75 * this.MAP_SIZE + 2) * Math.round(this.GRID_Y_SPACE);
+    },
+    MAP_HEIGHT() {
+      return (2.05 * this.MAP_SIZE + 2) * Math.round(this.GRID_Y_SPACE);
+    },
+    GRID_X_SPACE() {
+      return this.RADIUS * 2 - this.EDGE_LEN * 0.5;
+    },
+  },
   mounted() {
+    console.log(this.GRID_X_SPACE);
     var canvas = document.getElementById("canvas");
-    canvas.setAttribute("width", MAP_WIDTH + "px");
-    canvas.setAttribute("height", MAP_HEIGHT + "px");
-    this.drawGrid(MAP_SIZE, this.createPoly(RADIUS, EDGES));
+    canvas.setAttribute("width", this.MAP_WIDTH + "px");
+    canvas.setAttribute("height", this.MAP_HEIGHT + "px");
+    this.drawGrid(this.MAP_SIZE, this.createPoly(this.RADIUS, this.EDGES));
 
     const container = document.querySelector("#items-container");
 
@@ -85,51 +108,30 @@ export default {
       }
     }
   },
+  watch: {
+    MAP(newValue, oldValue) {
+      this.onMapChanged();
+    },
+  },
   methods: {
-    drawGrid(radius, hexPoints) {
+    ...mapActions(useGameStore, ["getMapById"]),
+    onMapChanged() {
+      this.drawGrid(this.MAP_SIZE, this.createPoly(this.RADIUS, this.EDGES));
+    },
+    drawGrid(map_size, hexPoints) {
       const ctx = this.$refs.canvas.getContext("2d");
       const center = P2();
-      for (let y = radius; y >= -radius; y--) {
-        for (let x = -radius; x <= radius; x++) {
-          if (x * y > 0 && Math.abs(x) + Math.abs(y) > radius) continue;
 
-          var color = "#FFF0";
-          ctx.fillStyle = color;
-          color = "#FFF";
-          var planetType = "none";
-          var type = "void";
-          if (this.distance(x, y) > 4) {
-            color = "#FFFF";
-            planetType = "none";
-            const random_number = Math.floor(Math.random() * 100) + 1;
-            type = "void";
-            if (random_number < 85) {
-            } else if (random_number < 95) {
-              type = "planet";
-              const rand = Math.floor(Math.random() * 100) + 1;
-              if (rand < 15) {
-                planetType = "indu";
-              } else if (rand < 45) {
-                planetType = "athmo";
-              } else if (rand < 65) {
-                planetType = "mine";
-              } else {
-                planetType = "agri";
-              }
-            } else {
-              type = "asteroid";
-            }
-          }
-          if (this.distance(x, y) < 3) {
-            color = "#FFF0";
-          }
-          if (y == 0 && x == 0) {
-            const hexCenter = this.gridToPixel(y, x, radius, center);
-            this.drawPlanet(hexCenter, RADIUS * 2.1, ctx, "sun");
-          } else {
-            const hexCenter = this.gridToPixel(y, x, radius, center);
-            this.drawPoly(hexCenter, hexPoints, ctx, y, x, type, color, planetType);
-          }
+      for (var hexa in this.MAP) {
+        var coord = this.MAP[hexa].coord;
+        var planetType = this.MAP[hexa].planet_type;
+        var type = this.MAP[hexa].type;
+
+        const hexCenter = this.gridToPixel(coord.y, coord.x, map_size, center);
+        if (type == "sun") {
+          this.drawPlanet(hexCenter, ctx, type);
+        } else {
+          this.drawPoly(hexCenter, hexPoints, ctx, type, "#FFF0", planetType);
         }
       }
     },
@@ -145,14 +147,14 @@ export default {
         return Math.max(dx, dy);
       }
     },
-    gridToPixel(gridX, gridY, radius, p = {}, color) {
-      p.x = (gridX + radius + 1) * GRID_X_SPACE;
-      p.y = (gridY + radius + 1) * GRID_Y_SPACE + gridX * GRID_Y_OFFSET;
+    gridToPixel(gridX, gridY, radius, p = {}) {
+      p.x = (gridX + radius + 1) * this.GRID_X_SPACE;
+      p.y = (gridY + radius + 1) * this.GRID_Y_SPACE + gridX * this.GRID_Y_OFFSET;
       return p;
     },
     pixelToGrid(p) {
-      var nearest = { d: MAP_WIDTH, x: 0, y: 0 };
-      const radius = MAP_SIZE;
+      var nearest = { d: this.MAP_WIDTH, x: 0, y: 0 };
+      const radius = this.MAP_SIZE;
       for (let y = radius; y >= -radius; y--) {
         for (let x = -radius; x <= radius; x++) {
           const o = this.gridToPixel(x, y, radius);
@@ -166,7 +168,7 @@ export default {
       }
       return nearest;
     },
-    drawPoly(p, points, ctx, col, row, type, color, planetType) {
+    drawPoly(p, points, ctx, type, color, planetType) {
       // p.x, p.y is center
       ctx.setTransform(1, 0, 0, 1, p.x, p.y);
       var i = 0;
@@ -187,9 +189,9 @@ export default {
 
       //ctx.fillText(`(${col},${row})`, 0, 0);
       if (type == "planet") {
-        this.drawPlanet(p, RADIUS - 30, ctx, planetType);
+        this.drawPlanet(p, ctx, planetType);
       } else if (type == "asteroid") {
-        this.drawAsteroids(p, RADIUS / 6, ctx);
+        this.drawAsteroids(p, this.RADIUS / 6, ctx);
       }
     },
 
@@ -197,10 +199,10 @@ export default {
       var asteroidNumber = Math.floor(Math.random() * 6) + 4;
       var i = 0;
       while (i < asteroidNumber) {
-        var maxX = p.x + GRID_X_SPACE / 2;
-        var minX = p.x - GRID_X_SPACE / 2;
-        var maxY = p.y + GRID_Y_SPACE / 2;
-        var minY = p.y - GRID_Y_SPACE / 2;
+        var maxX = p.x + this.GRID_X_SPACE / 2;
+        var minX = p.x - this.GRID_X_SPACE / 2;
+        var maxY = p.y + this.GRID_Y_SPACE / 2;
+        var minY = p.y - this.GRID_Y_SPACE / 2;
 
         var randX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
         var randY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
@@ -212,7 +214,7 @@ export default {
           randY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
           gridRand = this.pixelToGrid(P2(randX, randY));
           grid = this.pixelToGrid(P2(p.x, p.y));
-          distance = this.distance(gridRand.x, gridRand.y, grid.x, grid.y);
+          distance = this.distance(gridRand, gridRand.y, grid.x, grid.y);
         }
 
         var size = Math.floor(Math.random() * 20) + -10;
@@ -229,7 +231,7 @@ export default {
       ctx.drawImage(asteroids, -30, -30, 30 + size, 30 + size);
     },
 
-    drawPlanet(p, radius, ctx, type) {
+    drawPlanet(p, ctx, type) {
       var size = Math.floor(Math.random() * 20) + -10;
       if (type == "agri") {
         var planet = new Image();
@@ -282,7 +284,7 @@ export default {
     },
 
     createPoly(radius, sides, points = []) {
-      const step = TAU / sides;
+      const step = this.TAU / sides;
       var ang = 0,
         i = sides;
       while (i--) {
@@ -303,6 +305,12 @@ export default {
       //const clickedHex = this.getHexFromPixel(P2(x, y));
       //console.log(`Clicked hex: (${clickedHex.x},${clickedHex.y})`);
     },
+  },
+  async created() {
+    var response = await this.getMapById("8y1qMUXuCCToaVBDj45V");
+    this.MAP = response.map;
+    this.MAP_SIZE = response.size;
+    console.log("map changed");
   },
 };
 </script>
