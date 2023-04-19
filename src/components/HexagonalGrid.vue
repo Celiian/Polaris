@@ -92,13 +92,6 @@ export default {
       for (let y = radius; y >= -radius; y--) {
         for (let x = -radius; x <= radius; x++) {
           if (x * y > 0 && Math.abs(x) + Math.abs(y) > radius) continue;
-          /*var distance = 9 - this.distance(x, y);
-          if (distance <= 0) {
-            distance = 0;
-          }
-          console.log(distance);
-          var color = "#" + distance + distance + distance;
-          */
 
           var color = "#FFF0";
           ctx.fillStyle = color;
@@ -160,7 +153,7 @@ export default {
       return p;
     },
     pixelToGrid(p) {
-      var near = [];
+      var nearest = {d: MAP_WIDTH, x: 0, y: 0};
       const radius = MAP_SIZE;
       for (let y = radius; y >= -radius; y--) {
         for (let x = -radius; x <= radius; x++) {
@@ -168,12 +161,12 @@ export default {
           const dx = p.x - o.x;
           const dy = p.y - o.y;
           const d = dx * dx + dy * dy;
-          if (d < RADIUS * RADIUS) {
-            near.push([x, y]);
+          if (d <= nearest.d) {
+            nearest = {d: d, x: x, y: y};
           }
         }
       }
-      return near;
+      return nearest;
     },
     drawPoly(p, points, ctx, col, row, type, color, planetType) {
       // p.x, p.y is center
@@ -205,7 +198,6 @@ export default {
     drawAsteroids(p, radius, ctx) {
       var asteroidNumber = Math.floor(Math.random() * 6) + 4;
       var i = 0;
-      console.log(asteroidNumber);
       while (i < asteroidNumber) {
         var maxX = p.x + GRID_X_SPACE / 2;
         var minX = p.x - GRID_X_SPACE / 2;
@@ -214,15 +206,15 @@ export default {
 
         var randX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
         var randY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
-        var gridRand = this.pixelToGrid(P2(randX, randY))[0];
-        var grid = this.pixelToGrid(P2(p.x, p.y))[0];
-        var distance = this.distance(gridRand[0], gridRand[1], grid[0], grid[1]);
+        var gridRand = this.pixelToGrid(P2(randX, randY));
+        var grid = this.pixelToGrid(P2(p.x, p.y));
+        var distance = this.distance(gridRand.x, gridRand.y, grid.x, grid.y);
         while (distance != 0) {
           randX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
           randY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
-          gridRand = this.pixelToGrid(P2(randX, randY))[0];
-          grid = this.pixelToGrid(P2(p.x, p.y))[0];
-          distance = this.distance(gridRand[0], gridRand[1], grid[0], grid[1]);
+          gridRand = this.pixelToGrid(P2(randX, randY));
+          grid = this.pixelToGrid(P2(p.x, p.y));
+          distance = this.distance(gridRand.x, gridRand.y, grid.x, grid.y);
         }
 
         var size = Math.floor(Math.random() * 20) + -10;
