@@ -8,19 +8,19 @@
       <h1 class="flex w-full justify-center font-bold text-center text-white">Bienvenue sur Colons de Polaris</h1>
       <div class="container-main">
         <div class="bg-white rounded-md shadow-md p-4 mb-4">
-          <h2 class="text-lg font-bold mb-2">Entrez votre nom</h2>
-          <form>
+          <form class="flex flex-col items-center" @submit.prevent="submitForm">
             <div class="mb-4">
-              <label for="name" class="block text-gray-700 font-bold mb-2">Nom:</label>
-              <input type="text" id="name" name="name"
+              <input type="text" id="name" v-model="nom"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
                 placeholder="Entrez votre nom">
             </div>
             <button type="submit"
-              class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50">Envoyer</button>
+              class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50">Create
+              GameRoom</button>
           </form>
         </div>
         <div class="bg-white rounded-md shadow-md p-4">
+          <img :src="'@/public/icons/rules-icon.svg'" />
           <h2 class="text-lg font-bold mb-2">Règles du jeu</h2>
           <ul class="list-disc list-inside">
             <li>Le jeu se joue à deux joueurs.</li>
@@ -36,21 +36,21 @@
 
 <script>
 export default {
-  name: 'HomePage',
-
   data() {
     return {
-      playerName: '',
+      nom: ''
     }
   },
-
   methods: {
-    startGame() {
-
+    submitForm() {
+      const nom = this.nom;
+      this.$router.push({ name: 'gameroom', params: { nom } });
     }
   }
 }
 </script>
+
+
 
 <style scoped>
 .home-page {

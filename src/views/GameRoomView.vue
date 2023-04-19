@@ -1,0 +1,76 @@
+<template>
+  <div class="gameroom-container">
+    <div class="video-wrapper">
+      <video autoplay loop muted src="/src/assets/video/background-home.webm"></video>
+    </div>
+    <p>Bienvenue dans votre gameroom, {{ nom }} !</p>
+    <div class="main-gameroom-container">
+      <div class="players-list-container">
+
+      </div>
+      <div class="options-container">
+
+      </div>
+      <div>
+        <button @click="generateLink"
+          class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50">Inviter</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+
+export default {
+  data() {
+    return {
+      isRedirecting: false
+    }
+  },
+  methods: {
+    startGame() {
+    },
+    generateLink() {
+      const lienGenere = localStorage.getItem('lienGenere');
+      if (lienGenere) {
+        console.log('Le lien a déjà été généré :', lienGenere);
+        return;
+      }
+      const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let lien = window.location.href + "?";
+      console.log(lien)
+      for (let i = 0; i < 15; i++) {
+        lien += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+      }
+      navigator.clipboard.writeText(lien).then(() => {
+        console.log('Lien copié dans le presse-papiers :', lien);
+      }, () => {
+        console.error('Erreur lors de la copie du lien dans le presse-papiers');
+      });
+      localStorage.setItem('lienGenere', lien);
+    }
+  },
+  mounted() {
+    const nom = this.$route.params.nom;
+    console.log(nom);
+  },
+  computed: {
+    nom() {
+      return this.$route.params.nom;
+    }
+  }
+
+}
+</script>
+
+<style scoped>
+video {
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+</style>
