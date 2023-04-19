@@ -30,25 +30,6 @@ export default {
   methods: {
     startGame() {
     },
-    generateLink() {
-      const lienGenere = localStorage.getItem('lienGenere');
-      if (lienGenere) {
-        console.log('Le lien a déjà été généré :', lienGenere);
-        return;
-      }
-      const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let lien = window.location.origin + "?token=";
-      console.log(lien)
-      for (let i = 0; i < 15; i++) {
-        lien += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
-      }
-      navigator.clipboard.writeText(lien).then(() => {
-        console.log('Lien copié dans le presse-papiers :', lien);
-      }, () => {
-        console.error('Erreur lors de la copie du lien dans le presse-papiers');
-      });
-      localStorage.setItem('lienGenere', lien);
-    }
   },
   mounted() {
     const nom = this.$route.params.nom;
