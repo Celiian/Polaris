@@ -6,12 +6,12 @@
     <p>Bienvenue dans votre gameroom, {{ nom }} !</p>
     <div class="main-gameroom-container">
       <div class="players-list-container">
-
+        <li>{{ nom }}</li>
       </div>
       <div class="options-container">
 
       </div>
-      <div>
+      <div class="main-buttons-actions">
         <button @click="generateLink"
           class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50">Inviter</button>
       </div>
@@ -37,7 +37,7 @@ export default {
         return;
       }
       const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let lien = window.location.href + "?";
+      let lien = window.location.origin + "?token=";
       console.log(lien)
       for (let i = 0; i < 15; i++) {
         lien += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
@@ -53,6 +53,9 @@ export default {
   mounted() {
     const nom = this.$route.params.nom;
     console.log(nom);
+    window.addEventListener('beforeunload', (event) => {
+      localStorage.removeItem('lienGenere');
+    });
   },
   computed: {
     nom() {
