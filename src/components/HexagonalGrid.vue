@@ -100,40 +100,44 @@ export default {
           var color = "#" + distance + distance + distance;
           */
 
-          if (this.distance(x, y) > 3) {
+          var color = "#FFF0";
+          ctx.fillStyle = color;
+          color = "#FFF";
+
+          var planetType = "none";
+          var type = "void";
+
+          if (this.distance(x, y) > 4) {
+            color = "#FFFF";
+            planetType = "none";
             const random_number = Math.floor(Math.random() * 100) + 1;
-            var type = "void";
+            type = "void";
             if (random_number < 85) {
-              var color = "#3330";
             } else if (random_number < 95) {
               type = "planet";
               const rand = Math.floor(Math.random() * 100) + 1;
               if (rand < 15) {
-                var color = "#999";
+                planetType = "indu";
               } else if (rand < 45) {
-                var color = "#DDF";
+                planetType = "athmo";
               } else if (rand < 65) {
-                var color = "#700";
+                planetType = "mine";
               } else {
-                var color = "#080";
+                planetType = "agri";
               }
             } else {
               type = "asteroid";
-              var color = "#5208";
             }
-          } else {
-            var color = "#3330";
+          }
+          if (this.distance(x, y) < 3) {
+            color = "#FFF0";
           }
           if (y == 0 && x == 0) {
-            color = "#FF0C";
-          }
-          ctx.fillStyle = color;
-          const hexCenter = this.gridToPixel(y, x, radius, center);
-          if (y == 0 && x == 0) {
-            this.drawPlanet(hexCenter, RADIUS * 2.1, ctx, "#FF0F");
-          } else if (this.distance(x, y) < 2) {
+            const hexCenter = this.gridToPixel(y, x, radius, center);
+            this.drawPlanet(hexCenter, RADIUS * 2.1, ctx, "sun");
           } else {
-            this.drawPoly(hexCenter, hexPoints, ctx, y, x, type, color);
+            const hexCenter = this.gridToPixel(y, x, radius, center);
+            this.drawPoly(hexCenter, hexPoints, ctx, y, x, type, color, planetType);
           }
         }
       }
@@ -171,7 +175,7 @@ export default {
       }
       return near;
     },
-    drawPoly(p, points, ctx, col, row, type, color) {
+    drawPoly(p, points, ctx, col, row, type, color, planetType) {
       // p.x, p.y is center
       ctx.setTransform(1, 0, 0, 1, p.x, p.y);
       var i = 0;
@@ -181,25 +185,25 @@ export default {
         ctx.lineTo(p2.x, p2.y);
       }
       ctx.closePath();
-      ctx.strokeStyle = "#FFFFFF";
+      ctx.strokeStyle = color;
       ctx.stroke();
       ctx.textAlign = "center";
 
       if (type == "void") {
         ctx.fill();
-        ctx.fillStyle = "#FFFFFF";
+        ctx.fillStyle = color;
       }
 
-      ctx.fillText(`(${col},${row})`, 0, 0);
+      //ctx.fillText(`(${col},${row})`, 0, 0);
       if (type == "planet") {
-        this.drawPlanet(p, RADIUS - 30, ctx, color);
+        this.drawPlanet(p, RADIUS - 30, ctx, planetType);
       } else if (type == "asteroid") {
         this.drawAsteroids(p, RADIUS / 6, ctx);
       }
     },
 
     drawAsteroids(p, radius, ctx) {
-      var asteroidNumber = Math.floor(Math.random() * 10) + 4;
+      var asteroidNumber = Math.floor(Math.random() * 6) + 4;
       var i = 0;
       console.log(asteroidNumber);
       while (i < asteroidNumber) {
@@ -221,43 +225,70 @@ export default {
           distance = this.distance(gridRand[0], gridRand[1], grid[0], grid[1]);
         }
 
-        var asteroidEdges = Math.floor(Math.random() * 6) + 4;
-        var points = this.createPoly(radius, asteroidEdges);
-        this.drawCube(points, randX, randY, ctx);
+        var size = Math.floor(Math.random() * 20) + -10;
+
+        this.drawCube(size, randX, randY, ctx);
         i++;
       }
     },
 
-    drawCube(points, x, y, ctx) {
+    drawCube(size, x, y, ctx) {
       ctx.setTransform(1, 0, 0, 1, x, y);
-      var i = 0;
-      ctx.beginPath();
-      while (i < points.length) {
-        const p2 = points[i++];
-        ctx.lineTo(p2.x, p2.y);
-      }
-      ctx.closePath();
-      ctx.fill();
-      ctx.strokeStyle = "#520";
-      ctx.stroke();
-      ctx.fillStyle = "#520";
+      var asteroids = new Image();
+      asteroids.src = "https://pixelartmaker-data-78746291193.nyc3.digitaloceanspaces.com/image/dcf613a5c64cc75.png";
+      ctx.drawImage(asteroids, -30, -30, 30 + size, 30 + size);
     },
 
-    drawPlanet(p, radius, ctx, color) {
-      var points = this.createPoly(radius, 12);
-      // p.x, p.y is center
-      ctx.setTransform(1, 0, 0, 1, p.x, p.y);
-      var i = 0;
-      ctx.beginPath();
-      while (i < points.length) {
-        const p2 = points[i++];
-        ctx.lineTo(p2.x, p2.y);
+    drawPlanet(p, radius, ctx, type) {
+      var size = Math.floor(Math.random() * 20) + -10;
+      if (type == "agri") {
+        var planet = new Image();
+        planet.src =
+          "https://static.vecteezy.com/system/resources/previews/013/528/882/original/pixel-art-planet-earth-png.png";
+
+        ctx.drawImage(planet, -50, -50, 100 + size, 100 + size);
+      } else if (type == "sun") {
+        var planet = new Image();
+        planet.src =
+          "https://cdn.gamedevmarket.net/wp-content/uploads/20210802130653/3ccfc304882f325fd8fabc14e6b7162f.png";
+
+        ctx.drawImage(planet, -250, -140, 500, 500);
+      } else if (type == "mine") {
+        var planet = new Image();
+        planet.src =
+          " https://static.vecteezy.com/system/resources/previews/013/519/073/original/pixel-art-fictional-planet-png.png";
+
+        ctx.drawImage(planet, -50, -50, 100 + size, 100 + size);
+      } else if (type == "indu") {
+        var planet = new Image();
+        planet.src =
+          "https://static.vecteezy.com/system/resources/previews/013/519/075/original/pixel-art-fictional-planet-png.png";
+
+        ctx.drawImage(planet, -50, -50, 100 + size, 100 + size);
+      } else if (type == "athmo") {
+        var planet = new Image();
+        planet.src =
+          "https://static.vecteezy.com/system/resources/thumbnails/013/519/069/small_2x/pixel-art-fictional-planet-png.png";
+
+        ctx.drawImage(planet, -50, -50, 100 + size, 100 + size);
       }
-      ctx.closePath();
-      ctx.fill();
-      ctx.strokeStyle = color;
-      ctx.stroke();
-      ctx.fillStyle = color;
+
+      /*else {
+        var points = this.createPoly(radius, 12);
+        // p.x, p.y is center
+        ctx.setTransform(1, 0, 0, 1, p.x, p.y);
+        var i = 0;
+        ctx.beginPath();
+        while (i < points.length) {
+          const p2 = points[i++];
+          ctx.lineTo(p2.x, p2.y);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = color;
+        ctx.stroke();
+        ctx.fillStyle = color;
+      }*/
     },
 
     createPoly(radius, sides, points = []) {

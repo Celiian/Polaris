@@ -1,14 +1,14 @@
 <template class="test">
-  <HexagonalGrid />
+  <Map></Map>
 </template>
 
 <script>
-import HexagonalGrid from "./components/HexagonalGrid.vue";
+import Map from "./components/HexagonalGrid.vue";
 
 export default {
   name: "App",
   components: {
-    HexagonalGrid,
+    Map,
   },
 };
 </script>
