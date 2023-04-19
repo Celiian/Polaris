@@ -26,7 +26,7 @@
 const P2 = (x, y) => ({ x, y });
 const EDGES = 6;
 const RADIUS = 65;
-const MAP_SIZE = 17;
+const MAP_SIZE = 27;
 const TAU = 2 * Math.PI;
 const EDGE_LEN = Math.sin(Math.PI / EDGES) * RADIUS * 2;
 const GRID_Y_SPACE = Math.cos(Math.PI / EDGES) * RADIUS * 2;
