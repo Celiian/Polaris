@@ -1,11 +1,11 @@
 <template>
-  <div class="home-page">
+  <div class="h-screen">
     <template v-if="!token">
       <div class="video-wrapper">
         <video autoplay loop muted src="/src/assets/video/background-home.webm"></video>
       </div>
-      <div class="main-content">
-        <h1 class="flex w-full justify-center font-bold text-center text-white">Bienvenue sur Colons de Polaris</h1>
+      <div class="p-8 main-content">
+        <h1 class="flex w-full justify-center font-bold text-center text-lime-400 text-6xl mb-8">Bienvenue sur Colons de Polaris</h1>
         <div class="container-main">
           <div class="bg-white rounded-md shadow-md p-4 mb-4">
             <form class="flex flex-col items-center" @submit.prevent="submitForm">
@@ -36,7 +36,7 @@
       <div class="video-wrapper">
         <video autoplay loop muted src="/src/assets/video/background-home.webm"></video>
       </div>
-      <div class="main-content">
+      <div class="p-8 w-full">
         <h1 class="flex w-full justify-center font-bold text-center text-white">Vous avez été invitez à une partie Colons de Polaris !</h1>
         <div class="container-main">
           <div class="bg-white rounded-md shadow-md p-4 mb-4">
@@ -91,53 +91,9 @@ export default {
 
 
 <style scoped>
-.home-page {
-  height: 100vh;
-}
 
 video {
-  position: fixed;
-  z-index: -1;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #242424;
-  color: white;
-  padding: 2rem;
-  width: 20%;
-}
-
-.main-content {
-  padding: 2rem;
-  width: 100%;
-}
-
-.main-content h1 {
-  font-size: 4rem;
-  margin-bottom: 2rem;
-}
-
-.rules h2 {
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
-}
-
-.name-form h2 {
-  font-size: 2rem;
-}
-
-label {
-  display: block;
-  font-size: 1.5rem;
+  @apply -z-10 fixed top-0 left-0 w-full h-full object-cover;
 }
 
 .container-main {
