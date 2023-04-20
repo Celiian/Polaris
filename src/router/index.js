@@ -17,10 +17,10 @@ const router = createRouter({
       component: TestView,
     },
     {
-      path: "/gameroom",
+      path: "/gameroom:token",
       name: "gameroom",
-      component: GameRoom
-    }
+      component: GameRoom,
+    },
   ],
 });
 
