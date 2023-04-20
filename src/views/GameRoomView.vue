@@ -101,7 +101,7 @@ export default {
         console.log("Le lien a déjà été généré :", lienGenere);
         return;
       }
-      let lien = window.location.origin + "/gameroom/" + this.TokenAccessGame;
+      let lien = window.location + "/gameroom?room=" + this.TokenAccessGame;
       console.log(lien);
       navigator.clipboard.writeText(lien).then(
         () => {
