@@ -13,10 +13,8 @@
       </div>
       <div class="options-container"></div>
       <div class="main-buttons-actions">
-        <button
-          @click="copyInviteLink"
-          class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50"
-        >
+        <button @click="copyInviteLink"
+          class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50">
           Inviter
         </button>
       </div>
@@ -30,10 +28,7 @@
         &#8203;
         <div
           class="inline-block align-bottom bg-gray-800 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="modal-headline"
-        >
+          role="dialog" aria-modal="true" aria-labelledby="modal-headline">
           <div>
             <div class="mt-3 text-center sm:mt-5">
               <h3 class="text-lg leading-6 font-medium text-white" id="modal-headline">
@@ -42,19 +37,13 @@
               <div class="mt-2">
                 <form @submit.prevent="submitFormJoin">
                   <div class="mb-4">
-                    <input
-                      type="text"
-                      id="name"
-                      v-model="namePlayer"
+                    <input type="text" id="name" v-model="namePlayer"
                       class="w-full px-3 py-2 border border-gray-700 rounded-md bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-                      placeholder="Entrez votre nom"
-                    />
+                      placeholder="Entrez votre nom" />
                   </div>
                   <div class="flex justify-center">
-                    <button
-                      type="submit"
-                      class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50"
-                    >
+                    <button type="submit"
+                      class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50">
                       Rejoindre la partie
                     </button>
                   </div>
@@ -91,13 +80,8 @@ export default {
     var ws = new WebSocket("ws://localhost:8000/gameroom/" + this.GameRoomID);
 
     ws.onmessage = (event) => {
-      console.log(event);
       const data = JSON.parse(event.data);
-      console.log(data);
-      if (data.request === "getGameRoomById") {
-        console.log(data);
-        //this.players = data.response.players;
-      }
+      this.players = data.players;
     };
 
     ws.onopen = function (event) {
@@ -114,13 +98,22 @@ export default {
         console.log("GameRoomID is not defined");
       }
     };
+
+    // Force the update of players every second
+    setInterval(() => {
+      const message = JSON.stringify({
+        request: "/game_room",
+        GameRoomID: localStorage.getItem("GameRoomID"),
+      });
+      ws.send(message);
+    }, 1000);
   },
 
   methods: {
     ...mapActions(useGameStore, ["getGameRoomById", "joinRoomGame"]),
     submitFormJoin() {
       const namePlayer = this.namePlayer;
-      var editedToken = this.token.slice(0, -2); 
+      var editedToken = this.token.slice(0, -2);
       this.joinRoomGame(namePlayer, editedToken);
       this.token = null;
     },
