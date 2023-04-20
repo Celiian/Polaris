@@ -120,7 +120,8 @@ export default {
     ...mapActions(useGameStore, ["getGameRoomById", "joinRoomGame"]),
     submitFormJoin() {
       const namePlayer = this.namePlayer;
-      this.joinRoomGame(namePlayer, this.token);
+      var editedToken = this.token.slice(0, -2); 
+      this.joinRoomGame(namePlayer, editedToken);
       this.token = null;
     },
 
