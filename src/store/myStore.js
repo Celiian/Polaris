@@ -71,37 +71,34 @@ export const useGameStore = defineStore("store", {
             }
         },
         async createRoomGame(player_name, token_game_room) {
-            try {
-                const response = await axios.post(this.baseUrl + `create/game_room/${player_name}/${token_game_room}`, this.axiosHeader);
-                console.log(response)
-                return response.data;
-            } catch (error) {
-                if (error.response) {
-                    console.log(error.response.data);
-                    console.log(error.response.status);
-                    console.log(error.response.headers);
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log("Error", error.message);
-                }
-            }
+            return axios.post(this.baseUrl + `create/game_room/${player_name}/${token_game_room}`, this.axiosHeader)
+                .then(response => {
+                    return response.data;
+                })
+                .catch(error => {
+                    return error
+                });
         },
         async joinRoomGame(player_name, token_game_room) {
+            await axios.post(this.baseUrl + `join/game_room/${player_name}/${token_game_room}`, this.axiosHeader)
+                .then(response => {
+                    return response.data;
+                })
+                .catch(error => {
+                    return error;
+                });
+        },
+
+        async getGameRoomById(roomId) {
             try {
-                const response = await axios.post(this.baseUrl + `join/game_room/${player_name}/${token_game_room}`, this.axiosHeader);
-                return response.data;
+                const response = await axios.get(this.baseUrl + `game_room/${roomId}`, this.axiosHeader);
+                return response;
             } catch (error) {
-                if (error.response) {
-                    console.log(error.response.data);
-                    console.log(error.response.status);
-                    console.log(error.response.headers);
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log("Error", error.message);
-                }
+                console.log(error);
+                return error;
             }
         }
+
+
     },
 });

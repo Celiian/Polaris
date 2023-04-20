@@ -79,7 +79,7 @@ export default {
     return {
       nameOwnerPlayer: '',
       namePlayer: '',
-      token:'',
+      token: '',
       generatedToken: '',
     }
   },
@@ -106,14 +106,23 @@ export default {
       this.generateLink()
       const tokenRoom = this.generatedToken
       this.createRoomGame(nameOwnerPlayer, tokenRoom)
-      console.log(nameOwnerPlayer)
-      console.log(tokenRoom)
-      this.$router.push({ name: 'gameroom'});
+        .then((response) => {
+          const playerOwner = response.owner_room_game
+          const createdGameRoomId =response.room_id
+          const generatedTokenGameRoom = response.token_game_room
+          localStorage.setItem('playerOwner', playerOwner);
+          localStorage.setItem('GameRoomID', createdGameRoomId);
+          localStorage.setItem('TokenAccessGame', generatedTokenGameRoom);
+          this.$router.push({ name: 'gameroom' });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     submitFormJoin() {
       const namePlayer = this.namePlayer;
       this.joinRoomGame(namePlayer, this.token)
-      this.$router.push({ name: 'gameroom'});
+      this.$router.push({ name: 'gameroom' });
     }
   },
   mounted() {
