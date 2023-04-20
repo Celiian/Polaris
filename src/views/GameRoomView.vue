@@ -148,12 +148,22 @@ export default {
     this.playerOwner = localStorage.getItem("playerOwner");
     this.TokenAccessGame = localStorage.getItem("TokenAccessGame");
 
-    // window.addEventListener("beforeunload", (event) => {
-    //   localStorage.removeItem("TokenAccessGame");
-    //   localStorage.removeItem("playerOwner");
-    //   localStorage.removeItem("GameRoomID");
-    //   localStorage.removeItem("linkInviteGameRoom");
-    // });
+    window.addEventListener("beforeunload", this.handleBeforeUnload);
+  },
+
+  handleBeforeUnload(event) {
+    if (performance.navigation.type !== 1 && performance.navigation.type !== 0) {
+      // L'utilisateur n'est pas en train de rafraîchir la page
+      localStorage.removeItem("TokenAccessGame");
+      localStorage.removeItem("playerOwner");
+      localStorage.removeItem("GameRoomID");
+      localStorage.removeItem("linkInviteGameRoom");
+    } else {
+      // L'utilisateur rafraîchit la page
+      // Afficher une boîte de dialogue pour confirmer la navigation
+      event.preventDefault();
+      event.returnValue = "";
+    }
   },
 };
 </script>

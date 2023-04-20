@@ -91,6 +91,9 @@ export default {
         });
     },
   },
+  mounted(){
+    localStorage.clear();
+  }
 };
 </script>
 
