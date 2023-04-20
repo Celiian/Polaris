@@ -69,7 +69,7 @@ export default {
         generatedToken += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
       }
       this.lien += generatedToken;
-      console.log("Lien d'invitation : " + this.lien);
+      this.lien += '=0'
       this.generatedToken = generatedToken;
     },
     submitFormCreate() {

@@ -114,23 +114,26 @@ export default {
         console.log("Le lien a déjà été généré :", lienGenere);
         return;
       }
-      let lien = window.location + "/gameroom?room=" + this.TokenAccessGame;
-      console.log(lien);
-      navigator.clipboard.writeText(lien).then(
+      let lien = window.location.href;
+      let newLien = lien.slice(0, -1) + "1";
+
+      navigator.clipboard.writeText(newLien).then(
         () => {
-          console.log("Lien copié dans le presse-papiers :", lien);
+          console.log("Lien copié dans le presse-papiers :", newLien);
         },
         () => {
           console.error("Erreur lors de la copie du lien dans le presse-papiers");
         }
       );
-      localStorage.setItem("linkInviteGameRoom", lien);
+      localStorage.setItem("linkInviteGameRoom", newLien);
     },
   },
   mounted() {
     const params = new URLSearchParams(window.location.search);
-    console.log(params);
     this.token = params.get("room");
+    if (this.token.endsWith("0")) {
+      this.token = null;
+    }
     console.log(localStorage.getItem("GameRoomID"));
     this.GameRoomID = localStorage.getItem("GameRoomID");
     if (this.GameRoomID) {
