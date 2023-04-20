@@ -3,21 +3,30 @@
     <div class="video-wrapper">
       <video autoplay loop muted src="/src/assets/video/background-home.webm"></video>
     </div>
-    <h1 class="text-white">Bienvenue dans votre gameroom, {{ playerOwner }} !</h1>
-    <div class="main-gameroom-container">
-      <div class="players-list-container">
-        <div class="flex flex-column">
-          <h2 class="text-white">Liste des joueurs :</h2>
-          <p class="text-white" v-for="(player, index) in players" :key="index">{{ player }}</p>
+    <div class="p-20 flex flex-col">
+      <h1 class="text-white pt-20 text-center font-bold text-2xl">Bienvenue dans votre GameLobby</h1>
+      <div class="flex flex-row p-14 justify-around">
+        <div class="players-list-container">
+          <div class="flex flex-col">
+            <p>{{ playerOwner }}</p>
+            <p class="text-white" v-for="(player, index) in players" :key="index">{{ player }}</p>
+          </div>
+        </div>
+        <div class="options-container">
+          Voici tous les options
+          <ul>
+            <li>Taille de la Carte</li>
+            <li>Nombre de joueurs </li>
+            <li>Durée de partie</li>
+            <li>Voleur</li>
+          </ul>
+          <div class="main-buttons-actions">
+            <ButtonInvite :message="'Inviter'" :onClick="copyInviteLink" />
+            <ButtonStartGame :message="'Start'" :onClick="startGame" />
+          </div>
         </div>
       </div>
-      <div class="options-container"></div>
-      <div class="main-buttons-actions">
-        <button @click="copyInviteLink"
-          class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50">
-          Inviter
-        </button>
-      </div>
+
     </div>
     <div v-if="token" class="fixed z-10 inset-0 overflow-y-auto">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -58,10 +67,19 @@
 </template>
 
 <script>
+
+import ButtonInvite from "../components/ButtonInvite.vue";
+import ButtonStartGame from "../components/ButtonStartGame.vue";
+
 import { mapActions } from "pinia";
 import { useGameStore } from "../store/myStore";
 
 export default {
+  components: {
+    ButtonInvite,
+    ButtonStartGame
+  },
+
   data() {
     return {
       token: "",
@@ -116,7 +134,6 @@ export default {
       this.joinRoomGame(namePlayer, editedToken);
       this.token = null;
     },
-
     copyInviteLink() {
       const lienGenere = localStorage.getItem("linkInviteGameRoom");
       if (lienGenere) {
@@ -136,6 +153,9 @@ export default {
       );
       localStorage.setItem("linkInviteGameRoom", newLien);
     },
+    startGame(){
+      this.$router.push('/')
+    }
   },
   mounted() {
     const params = new URLSearchParams(window.location.search);
@@ -173,5 +193,12 @@ video {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.main-buttons-actions {
+  display: flex;
+  width: 300px;
+  justify-content: space-between;
+  padding-top: 50px;
 }
 </style>
