@@ -75,18 +75,31 @@ export default {
 
   created() {
     console.log("Starting connection to WebSocket Server");
-    var connection = new WebSocket("ws://localhost:8000/gameroom");
+    this.ws = new WebSocket("ws://localhost:8000/gameroom");
 
-    connection.onmessage = function (event) {
+    this.ws.onmessage = (event) => {
       console.log(event);
+      const data = JSON.parse(event.data);
+      if (data.request === "getGameRoomById") {
+        this.players = data.response.players;
+      }
     };
 
-    connection.onopen = function (event) {
+    this.ws.onopen = function (event) {
       console.log(event);
       console.log("Successfully connected to the echo websocket server...");
-      connection.send("hrlllo");
+      if (this.GameRoomID) {
+        const message = JSON.stringify({
+          request: "getGameRoomById",
+          GameRoomID: this.GameRoomID,
+        });
+        this.ws.send(message);
+      } else {
+        console.log("GameRoomID is not defined in localStorage");
+      }
     };
   },
+
   methods: {
     ...mapActions(useGameStore, ["getGameRoomById", "joinRoomGame"]),
     submitFormJoin() {
