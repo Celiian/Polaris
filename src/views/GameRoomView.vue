@@ -13,8 +13,10 @@
       </div>
       <div class="options-container"></div>
       <div class="main-buttons-actions">
-        <button @click="copyInviteLink"
-          class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50">
+        <button
+          @click="copyInviteLink"
+          class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50"
+        >
           Inviter
         </button>
       </div>
@@ -28,7 +30,10 @@
         &#8203;
         <div
           class="inline-block align-bottom bg-gray-800 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
-          role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-headline"
+        >
           <div>
             <div class="mt-3 text-center sm:mt-5">
               <h3 class="text-lg leading-6 font-medium text-white" id="modal-headline">
@@ -37,13 +42,19 @@
               <div class="mt-2">
                 <form @submit.prevent="submitFormJoin">
                   <div class="mb-4">
-                    <input type="text" id="name" v-model="namePlayer"
+                    <input
+                      type="text"
+                      id="name"
+                      v-model="namePlayer"
                       class="w-full px-3 py-2 border border-gray-700 rounded-md bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-                      placeholder="Entrez votre nom" />
+                      placeholder="Entrez votre nom"
+                    />
                   </div>
                   <div class="flex justify-center">
-                    <button type="submit"
-                      class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50">
+                    <button
+                      type="submit"
+                      class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50"
+                    >
                       Rejoindre la partie
                     </button>
                   </div>
@@ -74,28 +85,33 @@ export default {
   },
 
   created() {
-    console.log("Starting connection to WebSocket Server");
-    this.ws = new WebSocket("ws://localhost:8000/gameroom");
+    this.GameRoomID = localStorage.getItem("GameRoomID");
 
-    this.ws.onmessage = (event) => {
+    console.log("Starting connection to WebSocket Server");
+    var ws = new WebSocket("ws://localhost:8000/gameroom/" + this.GameRoomID);
+
+    ws.onmessage = (event) => {
       console.log(event);
       const data = JSON.parse(event.data);
+      console.log(data);
       if (data.request === "getGameRoomById") {
-        this.players = data.response.players;
+        console.log(data);
+        //this.players = data.response.players;
       }
     };
 
-    this.ws.onopen = function (event) {
+    ws.onopen = function (event) {
       console.log(event);
       console.log("Successfully connected to the echo websocket server...");
-      if (this.GameRoomID) {
+      if (localStorage.getItem("GameRoomID")) {
         const message = JSON.stringify({
-          request: "getGameRoomById",
-          GameRoomID: this.GameRoomID,
+          request: "/game_room",
+          GameRoomID: localStorage.getItem("GameRoomID"),
         });
-        this.ws.send(message);
+        ws.send(message);
+        console.log("GameRoomID sent");
       } else {
-        console.log("GameRoomID is not defined in localStorage");
+        console.log("GameRoomID is not defined");
       }
     };
   },
@@ -133,19 +149,6 @@ export default {
     this.token = params.get("room");
     if (this.token.endsWith("0")) {
       this.token = null;
-    }
-    console.log(localStorage.getItem("GameRoomID"));
-    this.GameRoomID = localStorage.getItem("GameRoomID");
-    if (this.GameRoomID) {
-      this.getGameRoomById(this.GameRoomID)
-        .then((response) => {
-          this.players = response.data.players;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else {
-      console.log("GameRoomID is not defined in localStorage");
     }
 
     this.playerOwner = localStorage.getItem("playerOwner");

@@ -92,11 +92,11 @@ export const useGameStore = defineStore("store", {
     },
 
     async getGameRoomById(roomId) {
+      console.log(roomId);
       try {
         const response = await axios.get(this.baseUrl + `game_room/${roomId}`, this.axiosHeader);
         return response;
       } catch (error) {
-        console.log(error);
         return error;
       }
     },
