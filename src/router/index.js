@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HexagonalGrid from "../components/HexagonalGrid.vue";
-//import Map from "../components/Map.vue";
+import Map from "../components/Map.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,13 +7,13 @@ const router = createRouter({
     {
       path: "/",
       name: "home",
-      component: HexagonalGrid,
+      component: Map,
     },
-    /*{
+    {
       path: "/map",
       name: "map",
       component: Map,
-    },*/
+    },
   ],
 });
 
