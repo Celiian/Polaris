@@ -17,7 +17,7 @@ const router = createRouter({
       component: TestView,
     },
     {
-      path: "/gameroom:token",
+      path: "/gameroom",
       name: "gameroom",
       component: GameRoom,
     },

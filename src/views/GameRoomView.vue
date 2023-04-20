@@ -13,32 +13,48 @@
       </div>
       <div class="options-container"></div>
       <div class="main-buttons-actions">
-        <button
-          @click="copyInviteLink"
-          class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50"
-        >
+        <button @click="copyInviteLink"
+          class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50">
           Inviter
         </button>
       </div>
     </div>
-  </div>
-  <form v-if="token" class="flex flex-col items-center" @submit.prevent="submitFormJoin">
-    <div class="mb-4">
-      <input
-        type="text"
-        id="name"
-        v-model="namePlayer"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-        placeholder="Entrez votre nom"
-      />
+    <div v-if="token" class="fixed z-10 inset-0 overflow-y-auto">
+      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity">
+          <div class="absolute inset-0 bg-gray-800 opacity-75"></div>
+        </div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
+        &#8203;
+        <div
+          class="inline-block align-bottom bg-gray-800 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+          role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+          <div>
+            <div class="mt-3 text-center sm:mt-5">
+              <h3 class="text-lg leading-6 font-medium text-white" id="modal-headline">
+                Entrez votre nom pour rejoindre la partie
+              </h3>
+              <div class="mt-2">
+                <form @submit.prevent="submitFormJoin">
+                  <div class="mb-4">
+                    <input type="text" id="name" v-model="namePlayer"
+                      class="w-full px-3 py-2 border border-gray-700 rounded-md bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                      placeholder="Entrez votre nom" />
+                  </div>
+                  <div class="flex justify-center">
+                    <button type="submit"
+                      class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50">
+                      Rejoindre la partie
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <button
-      type="submit"
-      class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50"
-    >
-      Rejoindre la partie
-    </button>
-  </form>
+  </div>
 </template>
 
 <script>
@@ -72,10 +88,11 @@ export default {
     };
   },
   methods: {
-    ...mapActions(useGameStore, ["getGameRoomById"]),
+    ...mapActions(useGameStore, ["getGameRoomById", "joinRoomGame"]),
     submitFormJoin() {
       const namePlayer = this.namePlayer;
       this.joinRoomGame(namePlayer, this.token);
+      this.token = null;
     },
 
     copyInviteLink() {
@@ -118,12 +135,12 @@ export default {
     this.playerOwner = localStorage.getItem("playerOwner");
     this.TokenAccessGame = localStorage.getItem("TokenAccessGame");
 
-    window.addEventListener("beforeunload", (event) => {
-      localStorage.removeItem("TokenAccessGame");
-      localStorage.removeItem("playerOwner");
-      localStorage.removeItem("GameRoomID");
-      localStorage.removeItem("linkInviteGameRoom");
-    });
+    // window.addEventListener("beforeunload", (event) => {
+    //   localStorage.removeItem("TokenAccessGame");
+    //   localStorage.removeItem("playerOwner");
+    //   localStorage.removeItem("GameRoomID");
+    //   localStorage.removeItem("linkInviteGameRoom");
+    // });
   },
 };
 </script>

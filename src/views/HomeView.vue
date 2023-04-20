@@ -55,7 +55,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions(useGameStore, ["createRoomGame", "joinRoomGame"]),
+    ...mapActions(useGameStore, ["createRoomGame"]),
     generateLink() {
       const lienGenere = localStorage.getItem("lienGenere");
       if (lienGenere) {
@@ -63,7 +63,7 @@ export default {
         return;
       }
       const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-      this.lien = "/gameroom:";
+      this.lien = "/gameroom?room=";
       let generatedToken = "";
       for (let i = 0; i < 15; i++) {
         generatedToken += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
