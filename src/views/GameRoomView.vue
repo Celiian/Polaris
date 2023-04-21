@@ -3,21 +3,35 @@
     <div class="video-wrapper">
       <video autoplay loop muted src="/src/assets/video/background-home.webm"></video>
     </div>
-    <h1 class="text-white">Bienvenue dans votre gameroom, {{ playerOwner }} !</h1>
-    <div class="main-gameroom-container">
-      <div class="players-list-container">
-        <div class="flex flex-column">
-          <h2 class="text-white">Liste des joueurs :</h2>
-          <p class="text-white" v-for="(player, index) in players" :key="index">{{ player }}</p>
+    <div class="p-20 flex flex-col">
+      <h1 class="text-white text-center font-bold text-2xl">Bienvenue dans votre GameLobby</h1>
+      <div class="flex flex-row p-14 justify-around">
+        <div class="players-list-container">
+          <div class="flex flex-col w-9/12 h-full justify-around">
+            <p class="owner-player-p"><img class="owner_player_logo" :src="CrownAstronautLogo"
+                alt="Logo Owner Astronaut" />{{ playerOwner }}</p>
+            <div v-for="(player, index) in players" :key="index">
+              <p class="players_logos_lobby" v-if="player"><img class="players_logo" :src="AstronautLogo"
+                  alt="Logo Astronaut" />{{ player }}</p>
+              <p v-else>Vide</p>
+            </div>
+          </div>
+        </div>
+        <div class="options-container">
+          <p>Voici tous les options</p>
+          <ul>
+            <li>Taille de la Carte</li>
+            <li>Nombre de joueurs </li>
+            <li>Durée de partie</li>
+            <li>Voleur</li>
+          </ul>
+          <div class="main-buttons-actions">
+            <ButtonInvite :message="'Inviter'" :onClick="copyInviteLink" />
+            <ButtonStartGame :message="'Start'" :onClick="startGame" />
+          </div>
         </div>
       </div>
-      <div class="options-container"></div>
-      <div class="main-buttons-actions">
-        <button @click="copyInviteLink"
-          class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50">
-          Inviter
-        </button>
-      </div>
+
     </div>
     <div v-if="token" class="fixed z-10 inset-0 overflow-y-auto">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -58,12 +72,25 @@
 </template>
 
 <script>
+
+import ButtonInvite from "../components/ButtonInvite.vue";
+import ButtonStartGame from "../components/ButtonStartGame.vue";
+import CrownAstronautLogo from '../assets/icons/crown_astronaut.png';
+import AstronautLogo from '../assets/icons/astronaut.png';
+
 import { mapActions } from "pinia";
 import { useGameStore } from "../store/myStore";
 
 export default {
+  components: {
+    ButtonInvite,
+    ButtonStartGame
+  },
+
   data() {
     return {
+      AstronautLogo: AstronautLogo,
+      CrownAstronautLogo: CrownAstronautLogo,
       token: "",
       isRedirecting: false,
       playerOwner: "",
@@ -116,7 +143,6 @@ export default {
       this.joinRoomGame(namePlayer, editedToken);
       this.token = null;
     },
-
     copyInviteLink() {
       const lienGenere = localStorage.getItem("linkInviteGameRoom");
       if (lienGenere) {
@@ -136,6 +162,9 @@ export default {
       );
       localStorage.setItem("linkInviteGameRoom", newLien);
     },
+    startGame() {
+      this.$router.push('/')
+    }
   },
   mounted() {
     const params = new URLSearchParams(window.location.search);
@@ -173,5 +202,57 @@ video {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.players-list-container {
+  display: flex;
+  width: 500px;
+  padding: 20px;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 10px;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  height: 400px;
+}
+
+.owner_player_logo {
+  display: flex;
+  width: 50px;
+}
+
+p.owner-player-p[data-v-fe1722f6] {
+  display: flex;
+  justify-content: flex-start;
+  padding: 20px;
+  background-color: #494e7f;
+  border-radius: 20px;
+  color: white;
+  font-weight: bold;
+  height: 75px;
+  align-items: center;
+}
+
+img.players_logo {
+  display: flex;
+  width: 35px;
+}
+
+.players_logos_lobby {
+  display: flex;
+  justify-content: flex-start;
+  padding: 20px 20px 20px 25px;
+  background-color: #494e7f;
+  border-radius: 20px;
+  color: white;
+  font-weight: bold;
+  height: 75px;
+  align-items: center;
+}
+
+.main-buttons-actions {
+  display: flex;
+  width: 300px;
+  justify-content: space-between;
+  padding-top: 50px;
 }
 </style>
