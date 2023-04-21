@@ -4,16 +4,21 @@
       <video autoplay loop muted src="/src/assets/video/background-home.webm"></video>
     </div>
     <div class="p-20 flex flex-col">
-      <h1 class="text-white pt-20 text-center font-bold text-2xl">Bienvenue dans votre GameLobby</h1>
+      <h1 class="text-white text-center font-bold text-2xl">Bienvenue dans votre GameLobby</h1>
       <div class="flex flex-row p-14 justify-around">
         <div class="players-list-container">
-          <div class="flex flex-col">
-            <p>{{ playerOwner }}</p>
-            <p class="text-white" v-for="(player, index) in players" :key="index">{{ player }}</p>
+          <div class="flex flex-col w-9/12 h-full justify-around">
+            <p class="owner-player-p"><img class="owner_player_logo" :src="CrownAstronautLogo"
+                alt="Logo Owner Astronaut" />{{ playerOwner }}</p>
+            <div v-for="(player, index) in players" :key="index">
+              <p class="players_logos_lobby" v-if="player"><img class="players_logo" :src="AstronautLogo"
+                  alt="Logo Astronaut" />{{ player }}</p>
+              <p v-else>Vide</p>
+            </div>
           </div>
         </div>
         <div class="options-container">
-          Voici tous les options
+          <p>Voici tous les options</p>
           <ul>
             <li>Taille de la Carte</li>
             <li>Nombre de joueurs </li>
@@ -70,6 +75,8 @@
 
 import ButtonInvite from "../components/ButtonInvite.vue";
 import ButtonStartGame from "../components/ButtonStartGame.vue";
+import CrownAstronautLogo from '../assets/icons/crown_astronaut.png';
+import AstronautLogo from '../assets/icons/astronaut.png';
 
 import { mapActions } from "pinia";
 import { useGameStore } from "../store/myStore";
@@ -82,6 +89,8 @@ export default {
 
   data() {
     return {
+      AstronautLogo: AstronautLogo,
+      CrownAstronautLogo: CrownAstronautLogo,
       token: "",
       isRedirecting: false,
       playerOwner: "",
@@ -153,7 +162,7 @@ export default {
       );
       localStorage.setItem("linkInviteGameRoom", newLien);
     },
-    startGame(){
+    startGame() {
       this.$router.push('/')
     }
   },
@@ -193,6 +202,51 @@ video {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.players-list-container {
+  display: flex;
+  width: 500px;
+  padding: 20px;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 10px;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  height: 400px;
+}
+
+.owner_player_logo {
+  display: flex;
+  width: 50px;
+}
+
+p.owner-player-p[data-v-fe1722f6] {
+  display: flex;
+  justify-content: flex-start;
+  padding: 20px;
+  background-color: #494e7f;
+  border-radius: 20px;
+  color: white;
+  font-weight: bold;
+  height: 75px;
+  align-items: center;
+}
+
+img.players_logo {
+  display: flex;
+  width: 35px;
+}
+
+.players_logos_lobby {
+  display: flex;
+  justify-content: flex-start;
+  padding: 20px 20px 20px 25px;
+  background-color: #494e7f;
+  border-radius: 20px;
+  color: white;
+  font-weight: bold;
+  height: 75px;
+  align-items: center;
 }
 
 .main-buttons-actions {
