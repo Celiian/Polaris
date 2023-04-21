@@ -1,5 +1,16 @@
 <template>
+  <div class="navbar">
+    <p>Navbar</p>
+  </div>
   <div ref="container"></div>
+  <div class="bottom-controls">
+    <div class="controlls-container">
+      <p>Controlls Container</p>
+    </div>
+    <div class="mini-map">
+      <p>MiniMap</p>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -111,6 +122,7 @@ export default {
       // Convert the mouse position to grid coordinates
       const grid = this.pixelToGrid(event.x, event.y);
       console.log(grid);
+      console.log("clicked")
     });
 
     app.view.addEventListener("wheel", (e) => {
@@ -255,3 +267,38 @@ export default {
   },
 };
 </script>
+
+<style>
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid #ccc;
+  box-sizing: border-box;
+  z-index: 1;
+}
+
+.controlls-container {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  width: 450px;
+  height: 350px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: 1px solid #ccc;
+  z-index: 1;
+}
+
+.mini-map {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  width: 250px;
+  height: 250px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: 1px solid #ccc;
+}
+</style>
