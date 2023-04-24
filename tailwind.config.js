@@ -9,7 +9,11 @@ module.exports = {
     './src/**/*.tsx',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: '#ff5900',
+      }
+    },
   },
   plugins: [],
 }
